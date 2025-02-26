@@ -1,6 +1,6 @@
 ---
 - name: Configure LVM
-  hosts: vm
+  hosts: localhost
   become: true
   vars_prompt:
     - name: "device"
