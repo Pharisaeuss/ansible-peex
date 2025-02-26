@@ -1,6 +1,6 @@
 ---
   - name: Configure LVM
-    hosts: vm
+    hosts: localhost
     become: true
     vars_prompt:
       - name: "device"
@@ -91,9 +91,3 @@
           fstype: ext4
           opts: defaults
           state: present
-  
-      - name: Reboot the system
-        reboot:
-          msg: "Rebooting"
-          pre_reboot_delay: 10
-          post_reboot_delay: 30
