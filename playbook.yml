@@ -4,18 +4,23 @@
     become: true
     vars_prompt:
       - name: "device"
+        default: "/dev/sdb"
         prompt: "Enter the device for the partition or PV (e.g., /dev/sdb)"
         private: no
       - name: "vg_name"
+        default: "vg_data"
         prompt: "Enter the name for the Volume Group (e.g., vg_data)"
         private: no
       - name: "lv_name"
+        default: "lv_data"
         prompt: "Enter the name for the Logical Volume (e.g., lv_data)"
         private: no
       - name: "lv_size"
+        default: "10G"
         prompt: "Enter the size of the Logical Volume (e.g., 10G)"
         private: no
       - name: "mount_path"
+        default: "/var"
         prompt: "Enter the mount path for the Logical Volume (e.g., /var)"
         private: no
   
