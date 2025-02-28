@@ -1,98 +1,55 @@
----
-  - name: Configure LVM
-    hosts: localhost
-    become: true
-    vars_prompt:
-      - name: "device"
-        default: "/dev/sdb"
-        prompt: "Enter the device for the partition or PV (e.g., /dev/sdb)"
-        private: no
-      - name: "vg_name"
-        default: "vg_data"
-        prompt: "Enter the name for the Volume Group (e.g., vg_data)"
-        private: no
-      - name: "lv_name"
-        default: "lv_data"
-        prompt: "Enter the name for the Logical Volume (e.g., lv_data)"
-        private: no
-      - name: "lv_size"
-        default: "10G"
-        prompt: "Enter the size of the Logical Volume (e.g., 10G)"
-        private: no
-      - name: "mount_path"
-        default: "/var"
-        prompt: "Enter the mount path for the Logical Volume (e.g., /var)"
-        private: no
-  
-    tasks:
-      - name: Ensure lvm2 package is installed
-        package:
-          name: lvm2
-          state: present
-  
-      - name: Create partition (optional if device already has a partition)
-        parted:
-          device: "{{ device }}"
-          number: 1
-          state: present
-          part_end: 100%
-          flags: [ lvm ]
-        ignore_errors: yes  # Ignore if already partitioned
-  
-      - name: Initialize the Physical Volume (PV)
-        command: pvcreate "{{ device }}1"
-        when: device not in ansible_facts.lvm.pvs
-  
-      - name: Create Volume Group (VG) if not exists
-        lvg:
-          vg: "{{ vg_name }}"
-          pvs: "{{ device }}1"
-        when: vg_name not in ansible_facts.lvm.vgs
-  
-      - name: Create Logical Volume (LV)
-        lvol:
-          vg: "{{ vg_name }}"
-          lv: "{{ lv_name }}"
-          size: "{{ lv_size }}"
-          state: present
-  
-      - name: Create filesystem on the Logical Volume
-        filesystem:
-          fstype: ext4
-          dev: "/dev/{{ vg_name }}/{{ lv_name }}"
-  
-      - name: Create mount directory if it does not exist
-        file:
-          path: "{{ mount_path }}"
-          state: directory
-          mode: '0755'
-  
-      - name: Mount the Logical Volume
-        mount:
-          path: "/mnt/{{ mount_path }}"
-          src: "/dev/{{ vg_name }}/{{ lv_name }}"
-          fstype: ext4
-          state: mounted
-  
-      - name: Copy existing /var data to the new Volume
-        command: rsync -a /var/ /mnt/var/
-  
-      - name: Unmount temporary mount
-        mount:
-          path: "mnt/{{ mount_path }}"
-          state: unmounted
-  
-      - name: Mount the new /var volume
-        mount:
-          path: "{{ mount_path }}"
-          src: "/dev/{{ vg_name }}/{{ lv_name }}"
-          fstype: ext4
-          state: mounted
-  
-      - name: Ensure mount persists on reboot
-        mount:
-          path: "{{ mount_path }}"
-          src: "/dev/{{ vg_name }}/{{ lv_name }}"
-          fstype: ext4
-          opts: defaults
-          state: present
+- name: Configuring ElasticSearch
+  hosts: localhost
+  become_method: sudo
+  become: true
+  gather_facts: false
+
+ tags:
+    - config
+    - configure 
+
+  tasks:
+
+  - name: update cache and ignore errors in case of problems
+      become: yes
+      apt: update_cache=yes
+      ignore_errors: yes
+
+ - name: install nginx
+      become: yes
+      apt: 
+        name: nginx
+        purge: yes
+        state: present
+
+ - name: install java 11
+      become: yes
+      apt: 
+        name: openjdk-11-jdk
+        purge: yes
+        state: present
+
+- name: Set Java home
+      shell: sudo echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> /etc/environment
+
+   - name: export Java home
+      shell: export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64 
+
+- name: Download ElasticSearch package
+      shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+- name: check package list
+      shell: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+
+-name: update cache and ignore errors in case of problems
+      become: yes
+      apt: update_cache=yes
+      ignore_errors: yes
+
+- name: install elasticsearch
+      become: yes
+      apt: 
+        name: elasticsearch
+        purge: yes
+        state: present
+      notify: restart elasticsearch
