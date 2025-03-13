@@ -1,6 +1,6 @@
 ---
 - name: Configuring ElasticSearch
-  hosts: localhost
+  hosts: codespaces
   become_method: sudo
   become: true
   gather_facts: false

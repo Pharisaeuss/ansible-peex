@@ -1,2 +1,3 @@
-[all]
-$(cat ip_address.txt) ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+codespaces:
+  hosts:
+    {{ secrests.IP_ADDRESS}}
