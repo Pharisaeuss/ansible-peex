@@ -1,0 +1,40 @@
+name: CI/CD for Elasticsearch Setup
+
+on:
+  push:
+    branches:
+      - elasticsearch
+  pull_request:
+    branches:
+      - elasticsearch
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Ansible
+        uses: ansible/ansible-lint-action@v5
+        with:
+          version: latest
+
+      - name: Run Ansible Playbook
+        run: ansible-playbook -i hosts ansible-elasticsearch.yml
+
+  tag:
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Create annotated tag
+        run: |
+          git config --global user.email ".com"
+          git config --global user.name "Your Name"
+          git tag -a v1.0.0 -m "Initial release of Elasticsearch setup"
+          git push origin v1.0.0
