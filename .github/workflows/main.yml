@@ -25,6 +25,9 @@ jobs:
       - name: Run Ansible Playbook
         run: ansible-playbook -i hosts elasticsearch.yml
 
+      - name: Check Elasticsearch
+        run: curl -X GET "localhost:9200"
+
   tag:
     runs-on: ubuntu-latest
     needs: setup
