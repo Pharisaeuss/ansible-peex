@@ -36,29 +36,43 @@ jobs:
     needs: setup
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+#      - name: Checkout repository
+   #     uses: actions/checkout@v2
 
-      - name: Configure Git
-        run: |
-          git config --global user.email "${{ secrets.EMAIL }}" &&
-          git config --global user.name "GitHub Actions Bot"
-        env:
-          EMAIL: ${{ secrets.EMAIL }}
-
-      - name: Create annotated tag
-        run: |
-          git tag -a v1.0.0 -m "Initial release of Elasticsearch setup" &&
-          git push origin v1.0.0
+   #   - name: Configure Git
+  #      run: |
+    #      git config --global user.email "${{ secrets.EMAIL }}" &&
+   #       git config --global user.name "GitHub Actions Bot"
+   #     env:
+   #       EMAIL: ${{ secrets.EMAIL }}
           
-      - name: Generate Changelog
-        run: |
-          echo "# Changelog" > CHANGELOG.md &&
-          echo "## [v1.0.0] - $(date +'%Y-%m-%d')" >> CHANGELOG.md &&
-          echo "- Initial release of Elasticsearch setup" >> CHANGELOG.md &&
-          git add CHANGELOG.md &&
-          git commit -m "Add changelog for v1.0.0" &&
-          git push origin main
+      - uses: actions/checkout@v4
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+          
+  #    - name: Create annotated tag
+  #      run: |
+  #        git tag -a v1.0.0 -m "Initial release of Elasticsearch setup" &&
+  #        git push origin v1.0.0
+          
+  #    - name: Generate Changelog
+  #      run: |
+  #        echo "# Changelog" > CHANGELOG.md &&
+  #        echo "## [v1.0.0] - $(date +'%Y-%m-%d')" >> CHANGELOG.md &&
+  #        echo "- Initial release of Elasticsearch setup" >> CHANGELOG.md &&
+  #        git add CHANGELOG.md &&
+  #        git commit -m "Add changelog for v1.0.0" &&
+  #        git push origin main
           
    #   - name: Create annotated tag
     #    run: |
