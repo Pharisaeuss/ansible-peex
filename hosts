@@ -1,3 +1,0 @@
-codespaces:
-  hosts:
-    "{{ secrets.IP_ADDRESS }}"
