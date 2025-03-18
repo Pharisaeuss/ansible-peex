@@ -35,7 +35,7 @@
 		"ghcr.io/devcontainers/features/common-utils:2": {},
 		"ghcr.io/lukewiwa/features/shellcheck:0": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/hspaans/devcontainer-features/ansible-lint:1": {},
-		"ghcr.io/devcontainers-extra/features/ansible:2": {}
+		"ghcr.io/devcontainers-extra/features/ansible:2": {},
+		"ghcr.io/davzucky/devcontainers-features-wolfi/bash:1": {}
 	}
 }
