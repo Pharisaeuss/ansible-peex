@@ -61,4 +61,10 @@
         name: elasticsearch
         state: restarted
 
+    - name: Configure Git
+      command: >
+        git config --global user.email "{{ secrets.USERNAME }}" &&
+        git config --global user.name "{{ secrets.EMAIL }}"
+      args:
+        chdir: https://github.com/Pharisaeuss/ansible-peex/
       
