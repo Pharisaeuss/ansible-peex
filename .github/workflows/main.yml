@@ -11,6 +11,9 @@ on:
 jobs:
   setup:
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -36,18 +39,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Generate Changelog
+      - name: Configure Git
         run: |
-          echo "# Changelog" > CHANGELOG.md
-          echo "## [v1.0.0] - $(date +'%Y-%m-%d')" >> CHANGELOG.md
-          echo "- Initial release of Elasticsearch setup" >> CHANGELOG.md
-          git add CHANGELOG.md
-          git commit -m "Add changelog for v1.0.0"
-          git push origin main
-          
+          git config --global user.email "${{ secrets.EMAIL }}" &&
+          git config --global user.name "GitHub Actions Bot"
+        env:
+          EMAIL: ${{ secrets.EMAIL }}
+
       - name: Create annotated tag
         run: |
-          git config --global user.email "{{ secrets.EMAIL }}"
-          git config --global user.name "{{ secrets.USERNAME }}"
-          git tag -a v1.0.0 -m "Initial release of Elasticsearch setup"
+          git tag -a v1.0.0 -m "Initial release of Elasticsearch setup" &&
           git push origin v1.0.0
+          
+      - name: Generate Changelog
+        run: |
+          echo "# Changelog" > CHANGELOG.md &&
+          echo "## [v1.0.0] - $(date +'%Y-%m-%d')" >> CHANGELOG.md &&
+          echo "- Initial release of Elasticsearch setup" >> CHANGELOG.md &&
+          git add CHANGELOG.md &&
+          git commit -m "Add changelog for v1.0.0" &&
+          git push origin main
+          
+   #   - name: Create annotated tag
+    #    run: |
+    #      git config --global user.email "{{ secrets.EMAIL }}"
+    #      git config --global user.name "{{ secrets.USERNAME }}"
+   #       git tag -a v1.0.0 -m "Initial release of Elasticsearch setup"
+    #      git push origin v1.0.0
