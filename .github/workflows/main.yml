@@ -10,7 +10,7 @@ on:
 
 jobs:
   setup:
-    runs-on: codespaces-7f7ffe-runner
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
