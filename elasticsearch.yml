@@ -60,5 +60,3 @@
       service:
         name: elasticsearch
         state: restarted
-
-      
